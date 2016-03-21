@@ -1,0 +1,17 @@
+.container {
+		margin-top:10px;
+	}
+
+.container #top {
+		height:100px;
+		background:#E73838;	
+	}
+.container #nav{
+		height:40px;
+		background:#00264d;
+	}
+
+.container #body{
+		height:530px;
+		background:#ffffcc;
+	}

@@ -2,7 +2,8 @@
 	require 'base.php';
 	require 'core.php';
 	require 'connect.php';
-	require 'session.php';
+	if(!isset($_SESSION['displayer']['user_id']))
+		header('Location:index.php');  
 ?>
 
 <!DOCTYPE html>
@@ -20,6 +21,7 @@
 			<div class="row" id="edit">
 					<div class="col-md-3" style="background:white;height:98%">
 						<div class="list-group">
+							<a href="edit.php" class="list-group-item">View</a>
 							<a href="logout.php" class="list-group-item">Logout</a>
 						</div>
 					</div>
@@ -41,7 +43,7 @@
 												<th>Remarks</th>
 											</tr>
 										</thead>';
-							if(isset($_POST['bill'])&&isset($_POST['array_search(needle, haystack)']))
+							if(isset($_POST['bill'])&&isset($_POST['search']))
 							{
 								$bill=$_POST['bill'];
 								if(!empty($bill))
@@ -53,7 +55,6 @@
 		   								while($row = $result->fetch_assoc())  
 		   								{
 			      							  echo '<tr>
-			       							  			<td><input type="checkbox" name="check[]" value="'.$row['build no and date'].'"/></td>
 			       							  			<td>'.$row["sl no"].'</td>
 			       							  			<td>'.$row["order no and date"].'</td>
 			       							  			<td>'.$row["date of receipt"].'</td>

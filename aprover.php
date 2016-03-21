@@ -2,7 +2,8 @@
 	require 'base.php';
 	require 'core.php';
 	require 'connect.php';
-	require 'session.php';
+	if(!isset($_SESSION['aprover']['user_id']))
+		header('Location:index.php');
 ?>
 
 <!DOCTYPE html>
@@ -16,10 +17,11 @@
 		<div class="row" id="edit">
 					<div class="col-md-3" style="background:white;height:98%">
 						<div class="list-group">
-							<a href="add.php" class="list-group-item">Add</a>
+							<!--<a href="add.php" class="list-group-item">Add</a>
 							<a href="$" class="list-group-item">Select</a>
 							<a href="$" class="list-group-item">Delete</a>
-							<a href="$" class="list-group-item">Add user</a>
+							<a href="$" class="list-group-item">Add user</a>-->
+							<a href="aprover.php" class="list-group-item">View</a>
 							<a href="logout.php" class="list-group-item">Logout</a>
 						</div>
 					</div>
@@ -37,7 +39,6 @@
 										<th>Description</th>
 										<th>Quantity</th>
 										<th>Rate</th>
-										<th>Initials of HOD</th>
 										<th>Aproval</th>
 										<th>Remarks</th>
 									</tr>
@@ -49,7 +50,7 @@
 
 	    							if(!isset($_POST['aprove'])||!isset($_POST['check']))
 	    							{
-		    							$sql = "SELECT * FROM `items` WHERE `$aprover_id`='2' ";
+		    							$sql = "SELECT * FROM `items` WHERE `$aprover_id`='1' ";
 										$result = $con->query($sql);		
 										if ($result->num_rows > 0) 
 										{
@@ -65,7 +66,6 @@
 		       							  				<td>'.$row["description"].'</td>
 		       								  			<td>'.$row["quantity"].'</td>
 		       								  			<td>'.$row["rate"].'</td>
-		       								  			<td>'.$row["initial of hod"].'</td>
 		       								  			<td>'.$row["Aproval"].'</td>
 		       								  			<td>'.$row["remarks"].'</td>
 		       								  		</tr>';
@@ -103,14 +103,6 @@
 													if($con->query($sql));
 													//if($result=mysqli_query($con,$sql))
 														//$b=1;
-												}
-												else
-												{
-													$next=$aprover_id+1;
-													$sql="UPDATE `items` SET `$next`='2' WHERE `build no and date`='$c'";
-													//if($result=mysqli_query($con,$sql))
-													if($con->query($sql));
-														//$c=1;
 												}
 												//echo $a.$b.$c.' ';
 											}

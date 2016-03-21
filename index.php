@@ -3,8 +3,11 @@
 	require 'core.php';
 	require 'connect.php';
 
-	if(isset($_SESSION['user']['user_id'])&&!empty($_SESSION['user']['user_id']))
+	if(isset($_SESSION['displayer']['user_id'])&&!empty($_SESSION['displayer']['user_id']))
 		header('Location:edit.php');
+
+	if(isset($_SESSION['user']['user_id'])&&!empty($_SESSION['user']['user_id']))
+		header('Location:add.php');
 
 	if(isset($_SESSION['aprover']['user_id'])&&!empty($_SESSION['aprover']['user_id']))
 		header('Location:aprover.php');
@@ -36,6 +39,59 @@
 
 
 				<div class="col-md-3" style="margin-top:10px;border:0.5px solid #999999;border-radius:3px;padding:10px;width:24%;">
+					<?php
+						if(isset($_POST['dName'])&&isset($_POST['dPwd']))
+						{
+							$username=$_POST['dName'];
+							$password=$_POST['dPwd'];
+							if(!empty($username)&&!empty($password))
+							{
+								$pass=md5($password);
+								$query="SELECT `Sl No` FROM `displayer` WHERE `name`='$username' && `password`='$pass'";
+								if($query_run=mysqli_query($con,$query))
+								{
+									$query_run_rows=mysqli_num_rows($query_run);
+									if($query_run_rows!=0)
+									{
+										$row = mysqli_fetch_assoc($query_run);
+    									$user_id = $row['Sl No'];
+    									
+										$_SESSION['displayer']['user_id']=$user_id;							
+										header('Location:edit.php');
+									}
+									else
+									{
+										echo 'missmatch';
+										
+									}
+							
+								}
+								else
+										echo 'querry failed';
+								
+							}
+							else
+							{
+								echo 'please enter values:';
+								
+							}
+						}
+					?>
+
+					<form role="form" method="POST" action="index.php">
+						<div style="background:#262626;font-size:20px;color:white;text-align:center;width:100%;height:35px;margin-bottom:5px;padding:2px;">Displayer LOGIN</div>
+						<div class="form-group">
+					    	<label for="username">Username:</label>
+					    	<input type="text" class="form-control" id="dName" name="dName" style="height:30px;">
+			            </div>
+						<div class="form-group">
+						    <label for="pwd">Password:</label>
+						    <input type="password" class="form-control" id="dPwd" name="dPwd" style="height:30px;">
+						 </div>
+						 <button type="submit" id="button" class="btn btn-default">Submit</button>
+					</form>
+				</div>
+				<div class="col-md-3" style="margin-top:10px;border:0.5px solid #999999;border-radius:3px;padding:10px;width:24%;">
 					
 					<?php
 						if(isset($_POST['uName'])&&isset($_POST['uPwd']))
@@ -55,7 +111,7 @@
     									$user_id = $row['id'];
     									
 										$_SESSION['user']['user_id']=$user_id;
-										header('Location:edit.php');
+										header('Location:add.php');
 									}
 									else
 									{

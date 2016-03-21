@@ -2,7 +2,8 @@
 	require 'base.php';
 	require 'core.php';
 	require 'connect.php';
-	require 'session.php';
+	if(!isset($_SESSION['displayer']['user_id']))
+		header('Location:index.php');
 ?>
 
 <!DOCTYPE html>
@@ -20,10 +21,10 @@
 			<div class="row" id="edit">
 					<div class="col-md-3" style="background:white;height:98%">
 						<div class="list-group">
-							<a href="add.php" class="list-group-item">Add</a>
+							<!--<a href="add.php" class="list-group-item">Add</a>
 							<a href="$" class="list-group-item">Select</a>
-							<a href="$" class="list-group-item">Delete</a>
-							<a href="$" class="list-group-item">Add user</a>
+							<a href="$" class="list-group-item">Delete</a>-->
+							<a href="search.php" class="list-group-item">Search</a>
 							<a href="logout.php" class="list-group-item">Logout</a>
 						</div>
 					</div>
@@ -39,7 +40,6 @@
 									<th>Description</th>
 									<th>Quantity</th>
 									<th>Rate</th>
-									<th>Initials of HOD</th>
 									<th>Aproval</th>
 									<th>Remarks</th>
 								</tr>
@@ -62,7 +62,6 @@
         							  			<td>".$row["description"]."</td>
         							  			<td>".$row["quantity"]."</td>
         							  			<td>".$row["rate"]."</td>
-        							  			<td>".$row["initial of hod"]."</td>
         							  			<td>".$row["Aproval"]."</td>
         							  			<td>".$row["remarks"]."</td>
         							  			<td></td>

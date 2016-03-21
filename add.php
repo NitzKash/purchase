@@ -2,7 +2,8 @@
 	require 'base.php';
 	require 'core.php';
 	require 'connect.php';
-	require 'session.php';
+	if(!isset($_SESSION['user']['user_id']))
+		header('Location:index.php');
 ?>
 
 <!DOCTYPE html>
@@ -20,16 +21,16 @@
 			<div class="row" id="edit">
 					<div class="col-md-3" style="background:white;height:98%">
 						<div class="list-group">
-							<a href="add.php" class="list-group-item">Add</a>
+							<!--<a href="add.php" class="list-group-item">Add</a>
 							<a href="$" class="list-group-item">Select</a>
 							<a href="$" class="list-group-item">Delete</a>
-							<a href="$" class="list-group-item">Add user</a>
+							<a href="$" class="list-group-item">Add user</a>-->
 							<a href="logout.php" class="list-group-item">Logout</a>
 						</div>
 					</div>
 					<div class="col-md-9" style="background:white ;height:98%">
 						<?php
-							if(isset($_POST['order'])&&isset($_POST['date'])&&isset($_POST['bill'])&&isset($_POST['firm'])&&isset($_POST['description'])&&isset($_POST['quantity'])&&isset($_POST['rate1'])&&isset($_POST['rate2'])&&isset($_POST['hod'])&&isset($_POST['remarks']))
+							if(isset($_POST['order'])&&isset($_POST['date'])&&isset($_POST['bill'])&&isset($_POST['firm'])&&isset($_POST['description'])&&isset($_POST['quantity'])&&isset($_POST['rate1'])&&isset($_POST['rate2'])&&isset($_POST['remarks']))
 							{
 								$order=$_POST['order'];
 								$date=$_POST['date'];
@@ -39,36 +40,41 @@
 								$quantity=$_POST['quantity'];
 								$rate1=$_POST['rate1'];
 								$rate2=$_POST['rate2'];
-								$hod=$_POST['hod'];
-								switch($hod)
-								{
-									case "Sambhu":			$aprove_status=1;
-															break;
-									case "Ripon Patgiri": 	$aprove_status=2;
-														 	break;
-									case "Nidul Sinha": 	$aprove_status=3;
-															break;
-									case "N.V. Deshpande":  $aprove_status=4;
-															break;
-								}
-
 								$remarks=$_POST['remarks'];
 								
-								if(!empty($order)&&!empty($date)&&!empty($bill)&&!empty($firm)&&!empty($description)&&!empty($quantity)&&!empty($rate1)&&!empty($rate2)&&!empty($hod)&&!empty($aprove_status)&&!empty($remarks))
+								if(!empty($order)&&!empty($date)&&!empty($bill)&&!empty($firm)&&!empty($description)&&!empty($quantity)&&!empty($rate1)&&!empty($rate2)&&!empty($remarks))
 								{
-									$rate=$rate1+(0.01*$rate2);	
-									switch($aprove_status)
-									{	
-										case 1: $query="INSERT INTO `purchase`.`items` (`order no and date`,`date of receipt`,`build no and date`,`name of firm`,`description`,`quantity`,`rate`,`initial of hod`,`aprove_status`,`1`,`remarks`) VALUES ('$order','$date','$bill','$firm','$description','$quantity','$rate','$hod','$aprove_status','2','$remarks')";
-											break;
-										case 2: $query="INSERT INTO `purchase`.`items` (`order no and date`,`date of receipt`,`build no and date`,`name of firm`,`description`,`quantity`,`rate`,`initial of hod`,`aprove_status`,`1`,`2`,`remarks`) VALUES ('$order','$date','$bill','$firm','$description','$quantity','$rate','$hod','$aprove_status','2','1','$remarks')";
-											break;
-										case 3: $query="INSERT INTO `purchase`.`items` (`order no and date`,`date of receipt`,`build no and date`,`name of firm`,`description`,`quantity`,`rate`,`initial of hod`,`aprove_status`,`1`,`2`,`3`,`remarks`) VALUES ('$order','$date','$bill','$firm','$description','$quantity','$rate','$hod','$aprove_status','2','1','1','$remarks')";
-											break;							
-										case 4: $query="INSERT INTO `purchase`.`items` (`order no and date`,`date of receipt`,`build no and date`,`name of firm`,`description`,`quantity`,`rate`,`initial of hod`,`aprove_status`,`1`,`2`,`3`,`4`,`remarks`) VALUES ('$order','$date','$bill','$firm','$description','$quantity','$rate','$hod','$aprove_status','2','1','1','1','$remarks')";
-											break;
-									}
-									if($query_run=mysqli_query($con,$query))									
+									$rate=$rate1+(0.01*$rate2);
+									$query="INSERT INTO `purchase`.`items` (`order no and date`,`date of receipt`,`build no and date`,`name of firm`,`description`,`quantity`,`rate`,`remarks`) VALUES ('$order','$date','$bill','$firm','$description','$quantity','$rate','$remarks')";			
+									$flag=0;
+									if($result = $con->query($query))									
+									{
+										$flag=1;
+										$aprove_status=0;
+										foreach($_POST['hod'] as $c)
+										{
+											if($c!="none")
+											{	
+												$query1="UPDATE `items` SET `$c`='1' WHERE `build no and date`='$bill'";
+												if($result1 = $con->query($query1))
+													$aprove_status++;
+												else
+													$flag=0;
+											}
+										}
+										if($aprove_status==0)
+										{
+											$query2="UPDATE `items` SET `Aproval`='Aproved' WHERE `build no and date`='$bill'";
+											if($result2=$con->query($query2));
+											else
+												$flag=0;
+										}
+										$query3="UPDATE `items` SET `aprove_status`='$aprove_status' WHERE `build no and date`='$bill'";
+										if($result3=$con->query($query3));
+										else
+											$flag=0;
+									}	
+									if($flag===1)
 										echo 'Data entry succesful';
 									else
 										echo 'querry failed';
@@ -123,15 +129,27 @@
 										</td>
 									</tr>
 									<tr>
-										<td>Initial of HOD: </td>
-										<td>
-											<select name="hod">
-												<option value="Sambhu">Sambhu</option>
-			  									<option value="Ripon Patgiri">Ripon Patgiri</option>
-			 									<option value="Nidul Sinha">Nidul Sinha</option>
-												<option value="N.V. Deshpande">N.V. Deshpande</option>
-											</select> 
-										</td>
+										<td>Comitte: </td>
+											<?php
+												$sql="SELECT * FROM `aprover`";
+												$result = $con->query($sql);		
+												if ($result->num_rows > 0) 
+												{
+					   								while($row = $result->fetch_assoc()) 
+					   								{
+					   									echo '<td>';
+						   									echo '
+															<select name="hod[]">
+																<option value="none">none</option>';
+																$query="SELECT * FROM `aprover`";
+																$result1=$con->query($query);
+																while($row1 = $result1->fetch_assoc())
+																	echo '<option value="'.$row1["Sl No"].'">'.$row1["Name"].'</option>';
+															echo '</select>';
+														echo '</td>';
+													}
+												}
+											?> 
 									</tr>
 									<tr>
 										<td>Remarks: </td>
